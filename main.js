@@ -40,12 +40,14 @@ let scene = 'menu';
 
 function resizeCanvas() {
     if (scene === 'game') {
+        document.body.style.background = '#000000';
         const maxWidth = Math.min(window.innerWidth * 0.95, CONFIG.GAME_WIDTH);
         const maxHeight = Math.min(window.innerHeight * 0.95, CONFIG.GAME_HEIGHT);
         const ratio = Math.min(maxWidth / CONFIG.GAME_WIDTH, maxHeight / CONFIG.GAME_HEIGHT);
         canvas.width = CONFIG.GAME_WIDTH * ratio;
         canvas.height = CONFIG.GAME_HEIGHT * ratio;
     } else {
+        document.body.style.background = CONFIG.BG_COLOR;
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
     }
@@ -81,6 +83,20 @@ for (let i = 1; i <= 3; i++) {
     const rightImg = new Image();
     rightImg.src = `assets/sprite_right${i}.png`;
     playerSprites.right.push(rightImg);
+}
+
+// Audio
+const bgMusic = new Audio('sounds/bgm.mp3');
+bgMusic.loop = true;
+bgMusic.volume = 0.08;
+
+const doneSound = new Audio('sounds/done.mp3');
+doneSound.volume = 0.15;
+
+function playPointSound() {
+    const sound = new Audio('sounds/point.mp3');
+    sound.volume = 0.12;
+    sound.play().catch(e => {});
 }
 
 let mandarins = [];
@@ -556,6 +572,8 @@ function initGame() {
     loadStats();
     player.x = 0;
     player.targetX = 0;
+    
+    bgMusic.play().catch(e => console.log('Music play failed:', e));
 }
 
 function getGroundY() {
@@ -700,11 +718,14 @@ function updateGame(deltaTime) {
             
             if (mand.type === 3) {
                 gameOver = true;
+                bgMusic.pause();
+                doneSound.play().catch(e => {});
                 checkAndSaveStats();
                 break;
             }
             
             score += mand.type === 1 ? CONFIG.SCORE_MAND1 : CONFIG.SCORE_MAND2;
+            playPointSound();
             fallingMandarins.splice(i, 1);
             continue;
         }
@@ -715,6 +736,8 @@ function updateGame(deltaTime) {
                 continue;
             }
             gameOver = true;
+            bgMusic.pause();
+            doneSound.play().catch(e => {});
             checkAndSaveStats();
             break;
         }
@@ -909,14 +932,16 @@ canvas.addEventListener('click', () => {
                    Math.abs(mouseY - menuY) < 25) {
             scene = 'menu';
             resizeCanvas();
+            bgMusic.pause();
         }
     } else if (scene === 'howto' || scene === 'stats') {
-        const boxH = canvas.height * 0.75;
+        const boxH = scene === 'stats' ? canvas.height * 0.75 : canvas.height * 0.8;
         const boxY = (canvas.height - boxH) / 2;
         const backY = boxY + boxH - 50;
         if (Math.abs(mouseX - canvas.width / 2) < 60 && 
             Math.abs(mouseY - backY) < 20) {
             scene = 'menu';
+            resizeCanvas();
         }
     }
 });
@@ -930,6 +955,7 @@ window.addEventListener('keydown', (e) => {
         } else if (gameOver && e.key === 'Escape') {
             scene = 'menu';
             resizeCanvas();
+            bgMusic.pause();
         }
     }
 });
