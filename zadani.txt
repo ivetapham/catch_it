@@ -1,4 +1,0 @@
-Chtěla bych vytvořit webovou hru, kde bych využívala herní framework (např. kaboom.js nebo kaplay.js).
-Hráč ovládá postavu šipkami vlevo/vpravo a chytá padající objekty. Když se postava ve hře dotkne padajícího objektu,
-přičte se bod. Pokud to hráč nestihne a objekt se dotkne země, hra končí.
-Aplikace zobrazuje aktuální skóre a ukládá nejlepší skóre. 
