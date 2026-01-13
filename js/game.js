@@ -67,6 +67,10 @@ export function updateGame(deltaTime, time) {
     const scaleX = canvas.width / CONFIG.GAME_WIDTH;
     const scaleY = canvas.height / CONFIG.GAME_HEIGHT;
     
+    // Normalizace deltaTime pro 60 FPS (16.67ms per frame)
+    // Tím zajistíme stejnou rychlost bez ohledu na framerate
+    const normalizedDelta = deltaTime / 16.67;
+    
     // Aktualizace animací
     updatePlayerBounce(deltaTime);
     updateScoreJump(deltaTime);
@@ -74,7 +78,7 @@ export function updateGame(deltaTime, time) {
     updatePlayerGroundPosition();
     
     if (keys['ArrowLeft'] || keys['a'] || keys['A']) {
-        player.targetX -= CONFIG.PLAYER_SPEED * scaleX;
+        player.targetX -= CONFIG.PLAYER_SPEED * scaleX * normalizedDelta;
         player.direction = 'left';
         player.spriteTimer += deltaTime;
         if (player.spriteTimer > 150) {
@@ -82,7 +86,7 @@ export function updateGame(deltaTime, time) {
             player.spriteTimer = 0;
         }
     } else if (keys['ArrowRight'] || keys['d'] || keys['D']) {
-        player.targetX += CONFIG.PLAYER_SPEED * scaleX;
+        player.targetX += CONFIG.PLAYER_SPEED * scaleX * normalizedDelta;
         player.direction = 'right';
         player.spriteTimer += deltaTime;
         if (player.spriteTimer > 150) {
@@ -165,7 +169,7 @@ export function updateGame(deltaTime, time) {
     
     for (let i = fallingMandarins.length - 1; i >= 0; i--) {
         const mand = fallingMandarins[i];
-        mand.y += CONFIG.MANDARIN_FALL_SPEED * scaleY;
+        mand.y += CONFIG.MANDARIN_FALL_SPEED * scaleY * normalizedDelta;
         if (!mand.wobbleTime) mand.wobbleTime = 0;
         mand.wobbleTime += mand.wobbleSpeed;
         
